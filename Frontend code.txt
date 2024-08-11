@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Schedule and Relaxation App</title>
+    <script>
+        async function addSchedule() {
+            const formData = new FormData(document.getElementById('scheduleForm'));
+            const response = await fetch('/add_schedule', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            alert(result.message);
+            loadSchedule();
+        }
+
+        async function loadSchedule() {
+            const response = await fetch('/get_schedule');
+            const schedule = await response.json();
+            const scheduleList = document.getElementById('scheduleList');
+            scheduleList.innerHTML = '';
+            schedule.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${item.subject}: ${new Date(item.start_time).toLocaleString()} - ${new Date(item.end_time).toLocaleString()}`;
+                scheduleList.appendChild(listItem);
+            });
+        }
+
+        async function loadRelaxationTips() {
+            const response = await fetch('/relaxation_tips');
+            const tips = await response.json();
+            const tipsList = document.getElementById('tipsList');
+            tipsList.innerHTML = '';
+            tips.forEach(tip => {
+                const listItem = document.createElement('li');
+                listItem.textContent = tip;
+                tipsList.appendChild(listItem);
+            });
+        }
+
+        window.onload = function() {
+            loadSchedule();
+            loadRelaxationTips();
+        }
+    </script>
+</head>
+<body>
+    <h1>Student Schedule and Relaxation App</h1>
+    
+    <h2>Add Schedule</h2>
+    <form id="scheduleForm">
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" required>
+        <br>
+        <label for="start_time">Start Time:</label>
+        <input type="datetime-local" id="start_time" name="start_time" required>
+        <br>
+        <label for="end_time">End Time:</label>
+        <input type="datetime-local" id="end_time" name="end_time" required>
+        <br>
+        <button type="button" onclick="addSchedule()">Add Schedule</button>
+    </form>
+    
+    <h2>Schedule</h2>
+    <ul id="scheduleList"></ul>
+    
+    <h2>Relaxation Tips</h2>
+    <ul id="tipsList"></ul>
+</body>
+</html>
